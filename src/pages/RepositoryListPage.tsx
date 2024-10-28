@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { Repository } from "../interface";
+import RepositoryItem from "../components/RepositoryItem/RepositoryItem";
 
 export default function ListOfRepositories() {
-  const [dataOfRepos, setDataOfRepos] = useState([]);
+  const [dataOfRepos, setDataOfRepos] = useState<Repository[]>([]);
 
   useEffect(() => {
     const token = import.meta.env.VITE_TOKEN;
@@ -23,6 +25,11 @@ export default function ListOfRepositories() {
     getReposData();
   }, []);
 
-  console.log(dataOfRepos);
-  return <div>lol</div>;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+      {dataOfRepos.map((repoItem) => {
+        return <RepositoryItem key={repoItem.id} repo={repoItem} />;
+      })}
+    </div>
+  );
 }
