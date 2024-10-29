@@ -1,0 +1,19 @@
+.repository-container__item {
+  border: 1px solid black;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.button-container {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.button-container__edit-button {
+  background: green;
+}
+
+.button-container__delete-button {
+  background: red;
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Repository } from "../interface";
 import RepositoryItem from "../components/RepositoryItem/RepositoryItem";
+import styles from "./RepositoryListPage.module.css";
 
 export default function ListOfRepositories() {
   const [dataOfRepos, setDataOfRepos] = useState<Repository[]>([]);
@@ -26,7 +27,7 @@ export default function ListOfRepositories() {
   }, []);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+    <div className={styles["repository-wrapper"]}>
       {dataOfRepos.map((repoItem) => {
         return <RepositoryItem key={repoItem.id} repo={repoItem} />;
       })}
