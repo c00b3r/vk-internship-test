@@ -6,4 +6,5 @@ export interface Repository {
   private: boolean;
   description: string;
   url: string;
+  html_url: string;
 }
