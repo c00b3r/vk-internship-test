@@ -2,9 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { Repository } from "../interface";
 import { RepositoryItem } from "../components/RepositoryItem/RepositoryItem";
 import styles from "./RepositoryListPage.module.css";
+import { observer } from "mobx-react-lite";
+import repositoryStore from "../store/RepositoryStore";
 
-export default function ListOfRepositories() {
-  const [dataOfRepos, setDataOfRepos] = useState<Repository[]>([]);
+export const ListOfRepositories = observer(() => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [haveMoreData, setHasMoreData] = useState(true);
@@ -28,10 +29,11 @@ export default function ListOfRepositories() {
       );
       if (!response.ok) throw new Error(`${response.status}`);
       const data = await response.json();
-      setDataOfRepos((prevData) => [
-        ...prevData,
+      repositoryStore.setRepository([
+        ...repositoryStore.repositoryData,
         ...data.items.filter(
-          (newItem: { id: number }) => !prevData.some((item) => item.id === newItem.id),
+          (newItem: { id: number }) =>
+            !repositoryStore.repositoryData.some((item) => item.id === newItem.id),
         ),
       ]);
       setHasMoreData(data.items.length > 0);
@@ -59,10 +61,26 @@ export default function ListOfRepositories() {
     };
   }, [page, getReposData, scroll]);
 
+  const handleEdit = (id: number, updatedData: Partial<Repository>) => {
+    repositoryStore.editRepository(id, updatedData);
+  };
+
+  const handleDelete = (id: number) => {
+    repositoryStore.deleteRepository(id);
+  };
+
   return (
     <div className={styles["repository-wrapper"]}>
-      {dataOfRepos.map((repoItem, index) => {
-        return <RepositoryItem key={repoItem.id} repo={repoItem} index={index + 1} />;
+      {repositoryStore.repositoryData.map((repoItem, index) => {
+        return (
+          <RepositoryItem
+            key={repoItem.id}
+            repo={repoItem}
+            index={index + 1}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        );
       })}
       {loading && !error && <p>Загрузка данных...</p>}
       {!haveMoreData && <p>Больше репозиториев не найдено.</p>}
@@ -73,4 +91,4 @@ export default function ListOfRepositories() {
       )}
     </div>
   );
-}
+});

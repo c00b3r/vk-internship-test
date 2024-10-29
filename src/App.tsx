@@ -1,5 +1,5 @@
 import "./App.css";
-import ListOfRepositories from "./pages/RepositoryListPage";
+import { ListOfRepositories } from "./pages/RepositoryListPage";
 
 function App() {
   return (
