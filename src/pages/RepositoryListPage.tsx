@@ -4,6 +4,7 @@ import { RepositoryItem } from "../components/RepositoryItem/RepositoryItem";
 import styles from "./RepositoryListPage.module.css";
 import { observer } from "mobx-react-lite";
 import repositoryStore from "../store/RepositoryStore";
+import { Box, CircularProgress } from "@mui/material";
 
 export const ListOfRepositories = observer(() => {
   const [loading, setLoading] = useState(false);
@@ -47,7 +48,7 @@ export const ListOfRepositories = observer(() => {
   }, [error, haveMoreData, loading, page, token]);
 
   const scroll = useCallback(() => {
-    if (window.innerHeight + window.pageYOffset >= document.documentElement.scrollHeight) {
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) {
       setPage((prevPage) => prevPage + 1);
     }
   }, []);
@@ -82,13 +83,20 @@ export const ListOfRepositories = observer(() => {
           />
         );
       })}
-      {loading && !error && <p>Загрузка данных...</p>}
-      {!haveMoreData && <p>Больше репозиториев не найдено.</p>}
-      {error && (
-        <p>
-          Ошибка получения данных <button onClick={() => setError(false)}>Повторить</button>
-        </p>
-      )}
+      <Box display={"flex"} justifyContent={"center"} mt={3} minHeight="40px" alignItems="center">
+        {loading && !error && (
+          <Box display="flex" justifyContent="center" mt={3} margin={0}>
+            <CircularProgress />
+          </Box>
+        )}
+        {!haveMoreData && <p>Больше репозиториев не найдено.</p>}
+        {error && (
+          <div className={styles["error-container"]}>
+            <h3>Ошибка получения данных</h3>
+            <button onClick={() => setError(false)}>Повторить</button>
+          </div>
+        )}
+      </Box>
     </div>
   );
 });
