@@ -5,12 +5,15 @@ import styles from "./RepositoryListPage.module.css";
 import { observer } from "mobx-react-lite";
 import repositoryStore from "../store/RepositoryStore";
 import { Box, CircularProgress } from "@mui/material";
+import SearchBar from "../components/SearchBar/SearchBar";
 
 export const ListOfRepositories = observer(() => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [haveMoreData, setHasMoreData] = useState(true);
   const [error, setError] = useState(false);
+  const [sort, setSort] = useState("stars");
+  const [order, setOrder] = useState("desc");
 
   const token = import.meta.env.VITE_TOKEN;
 
@@ -20,7 +23,7 @@ export const ListOfRepositories = observer(() => {
 
     try {
       const response = await fetch(
-        `https://api.github.com/search/repositories?q=javascript&sort=stars&order=asc&page=${page}&per_page=30`,
+        `https://api.github.com/search/repositories?q=javascript&sort=${sort}&order=${order}&page=${page}&per_page=30`,
         {
           headers: {
             Accept: "application/vnd.github.v3+json",
@@ -30,13 +33,17 @@ export const ListOfRepositories = observer(() => {
       );
       if (!response.ok) throw new Error(`${response.status}`);
       const data = await response.json();
-      repositoryStore.setRepository([
-        ...repositoryStore.repositoryData,
-        ...data.items.filter(
-          (newItem: { id: number }) =>
-            !repositoryStore.repositoryData.some((item) => item.id === newItem.id),
-        ),
-      ]);
+      repositoryStore.setRepository(
+        page === 1
+          ? data.items
+          : [
+              ...repositoryStore.repositoryData,
+              ...data.items.filter(
+                (newItem: { id: number }) =>
+                  !repositoryStore.repositoryData.some((item) => item.id === newItem.id),
+              ),
+            ],
+      );
       setHasMoreData(data.items.length > 0);
       setError(false);
     } catch (error) {
@@ -45,13 +52,17 @@ export const ListOfRepositories = observer(() => {
     } finally {
       setLoading(false);
     }
-  }, [error, haveMoreData, loading, page, token]);
+  }, [error, haveMoreData, loading, order, page, sort, token]);
 
   const scroll = useCallback(() => {
     if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) {
       setPage((prevPage) => prevPage + 1);
     }
   }, []);
+
+  useEffect(() => {
+    repositoryStore.setRepository([]);
+  }, [sort, order]);
 
   useEffect(() => {
     getReposData();
@@ -71,32 +82,35 @@ export const ListOfRepositories = observer(() => {
   };
 
   return (
-    <div className={styles["repository-wrapper"]}>
-      {repositoryStore.repositoryData.map((repoItem, index) => {
-        return (
-          <RepositoryItem
-            key={repoItem.id}
-            repo={repoItem}
-            index={index + 1}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        );
-      })}
-      <Box display={"flex"} justifyContent={"center"} mt={3} minHeight="40px" alignItems="center">
-        {loading && !error && (
-          <Box display="flex" justifyContent="center" mt={3} margin={0}>
-            <CircularProgress />
-          </Box>
-        )}
-        {!haveMoreData && <p>Больше репозиториев не найдено.</p>}
-        {error && (
-          <div className={styles["error-container"]}>
-            <h3>Ошибка получения данных</h3>
-            <button onClick={() => setError(false)}>Повторить</button>
-          </div>
-        )}
-      </Box>
+    <div>
+      <SearchBar sort={sort} order={order} onSort={setSort} onOrder={setOrder} />
+      <div className={styles["repository-wrapper"]}>
+        {repositoryStore.repositoryData.map((repoItem, index) => {
+          return (
+            <RepositoryItem
+              key={repoItem.id}
+              repo={repoItem}
+              index={index + 1}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          );
+        })}
+        <Box display={"flex"} justifyContent={"center"} mt={3} minHeight="40px" alignItems="center">
+          {loading && !error && (
+            <Box display="flex" justifyContent="center" mt={3} margin={0}>
+              <CircularProgress />
+            </Box>
+          )}
+          {!haveMoreData && <p>Больше репозиториев не найдено.</p>}
+          {error && (
+            <div className={styles["error-container"]}>
+              <h3>Ошибка получения данных</h3>
+              <button onClick={() => setError(false)}>Повторить</button>
+            </div>
+          )}
+        </Box>
+      </div>
     </div>
   );
 });
