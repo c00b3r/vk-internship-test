@@ -1,5 +1,5 @@
 import { MenuItem, Select } from "@mui/material";
-import styles from "./SearchBar.module.css";
+import styles from "./SortItemsBar.module.css";
 
 interface SearchBarProps {
   sort: string;
@@ -8,7 +8,7 @@ interface SearchBarProps {
   onOrder: (value: string) => void;
 }
 
-export default function SearchBar({ sort, order, onSort, onOrder }: SearchBarProps) {
+export default function SortItemBar({ sort, order, onSort, onOrder }: SearchBarProps) {
   return (
     <div className={styles["search-bar"]}>
       <Select

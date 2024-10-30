@@ -13,7 +13,6 @@ import {
 
 interface RepositoryItemProps {
   repo: Repository;
-  index: number;
   onEdit: (id: number, updatedData: Partial<Repository>) => void;
   onDelete: (id: number) => void;
 }

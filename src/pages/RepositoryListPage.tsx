@@ -5,7 +5,7 @@ import styles from "./RepositoryListPage.module.css";
 import { observer } from "mobx-react-lite";
 import repositoryStore from "../store/RepositoryStore";
 import { Box, CircularProgress } from "@mui/material";
-import SearchBar from "../components/SearchBar/SearchBar";
+import SortItemBar from "../components/SortItemsBar/SortItemsBar";
 
 export const ListOfRepositories = observer(() => {
   const [loading, setLoading] = useState(false);
@@ -83,14 +83,13 @@ export const ListOfRepositories = observer(() => {
 
   return (
     <div>
-      <SearchBar sort={sort} order={order} onSort={setSort} onOrder={setOrder} />
+      <SortItemBar sort={sort} order={order} onSort={setSort} onOrder={setOrder} />
       <div className={styles["repository-wrapper"]}>
-        {repositoryStore.repositoryData.map((repoItem, index) => {
+        {repositoryStore.repositoryData.map((repoItem) => {
           return (
             <RepositoryItem
               key={repoItem.id}
               repo={repoItem}
-              index={index + 1}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />
