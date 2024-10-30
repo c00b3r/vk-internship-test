@@ -18,7 +18,6 @@ export const ListOfRepositories = observer(() => {
   const token = import.meta.env.VITE_TOKEN;
 
   const getReposData = useCallback(async () => {
-    if (loading || error || !haveMoreData) return;
     setLoading(true);
 
     try {
@@ -46,13 +45,12 @@ export const ListOfRepositories = observer(() => {
       );
       setHasMoreData(data.items.length > 0);
       setError(false);
+      setLoading(false);
     } catch (error) {
       console.error(error);
       setError(true);
-    } finally {
-      setLoading(false);
     }
-  }, [error, haveMoreData, loading, order, page, sort, token]);
+  }, [order, page, sort, token]);
 
   const scroll = useCallback(() => {
     if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) {
@@ -62,6 +60,10 @@ export const ListOfRepositories = observer(() => {
 
   useEffect(() => {
     repositoryStore.setRepository([]);
+    setLoading(true);
+    setPage(1);
+    setHasMoreData(true);
+    setError(false);
   }, [sort, order]);
 
   useEffect(() => {
